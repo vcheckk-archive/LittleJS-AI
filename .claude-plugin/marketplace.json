@@ -8,8 +8,23 @@
         {
             "name": "littlejs",
             "source": "./",
-            "description": "LittleJS game development: engine conventions, game scaffolding, API reference, shape art",
-            "category": "gamedev"
+            "description": "Make HTML5 games with the LittleJS engine. Scaffolds a complete playable project with the engine bundled - no clone, no npm install, no server - and applies the engine's conventions and hard-won pitfalls to any LittleJS code you write.",
+            "version": "1.0.0",
+            "author": { "name": "Frank Force", "url": "https://github.com/KilledByAPixel" },
+            "homepage": "https://github.com/KilledByAPixel/LittleJS-AI",
+            "repository": "https://github.com/KilledByAPixel/LittleJS-AI",
+            "license": "MIT",
+            "category": "Development",
+            "tags": [
+                "littlejs",
+                "gamedev",
+                "game-engine",
+                "html5",
+                "canvas",
+                "javascript",
+                "webgl",
+                "scaffolding"
+            ]
         }
     ]
 }

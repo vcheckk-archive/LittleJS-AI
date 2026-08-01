@@ -35,7 +35,9 @@ The plugin ships four skills:
 
 Cloning this repo is only needed for browsing the templates by hand — the plugin bundles everything else.
 
-**Developing the plugin itself?** Load it from your working tree with `claude --plugin-dir .` (then `/reload-plugins` after edits). Don't `/plugin install` your local copy — that installs a frozen snapshot. When bumping the engine in `dist/`, also refresh `reference.md` by hand and bump `version` in `.claude-plugin/plugin.json`, or installed users never receive the update.
+**Developing the plugin itself?** Load it from your working tree with `claude --plugin-dir .` (use forward slashes in the path — backslashes get mangled and silently load nothing), then `/reload-plugins` after edits. Don't `/plugin install` your local copy — that installs a frozen snapshot.
+
+Every user-visible change needs two things in the same commit: a bumped `version` in `.claude-plugin/plugin.json` and an entry in [CHANGELOG.md](CHANGELOG.md). The plugin cache is keyed by version, so without a bump, people who already installed the plugin receive nothing. When bumping the engine in `dist/`, also refresh `reference.md` by hand.
 
 For other tools, LittleJS also works great with GitHub Copilot, Codex, and Cursor.
 

@@ -178,6 +178,24 @@ Menu UI notes (when using `templates/menus.js`)
 - Use helper APIs (`createMenu`, `createToolbar`, `showConfirmDialog`, `showAlertDialog`, `showGameOverDialog`) instead of custom menu plumbing.
 - Use `showBest`, `showResetBest`, and best-score helper APIs when the game has a straightforward single best-score metric.
 
+This repo is also a Claude Code plugin
+- `.claude-plugin/marketplace.json` uses `"source": "./"`, so the ENTIRE repo is copied into
+  every user's plugin cache on install. Anything added at the repo root ships to users.
+  There is no ignore mechanism for plugin payload — keep unrelated material in its own repo.
+- The four skills in `skills/` are the plugin's product. They must stay portable:
+  `littlejs-conventions` in particular must contain zero repo paths, since it runs in projects
+  that have none of this repo's structure.
+- In a SKILL.md, `${CLAUDE_PLUGIN_ROOT}` does NOT expand — use `${CLAUDE_SKILL_DIR}`, and reach
+  the plugin root as `${CLAUDE_SKILL_DIR}/../..`.
+- **Any user-visible change requires bumping `version` in `.claude-plugin/plugin.json` AND adding
+  a `CHANGELOG.md` entry, in the same commit.** The plugin cache is keyed by version: without a
+  bump, already-installed users receive nothing, no matter what you push.
+- Run `claude plugin validate .` after touching either manifest.
+
 Notes
 - `reference.md` documents major LittleJS API surface.
 - Open each game's `index.html` directly in the browser for testing (no server required).
+- `saveDataInit` (templates/menus.js), `SoundGenerator` (templates/gameFx.js), and
+  `initDefaultAtlas` (templates/textureGenerator.js) are helper modules, NOT engine globals —
+  using one requires loading its script. Grep `dist/littlejs.js` before assuming a symbol is
+  engine API.
