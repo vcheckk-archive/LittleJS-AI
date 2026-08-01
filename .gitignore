@@ -2,8 +2,8 @@
 node_modules
 
 # game build artifacts
-games/*/build/
-games/*/*.zip
+examples/*/build/
+examples/*/*.zip
 
 # local files
 local/
@@ -15,9 +15,6 @@ docs/
 # personal Claude Code settings (machine-specific)
 .claude/settings.json
 .claude/settings.local.json
-
-# runtime data from skills (per-session scratch dirs)
-.claude/skills/*/sessions/
 
 # playwright-mcp scratch dir
 .playwright-mcp/
