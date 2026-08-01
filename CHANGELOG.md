@@ -6,6 +6,14 @@ Notable changes to the **littlejs** Claude Code plugin. Follows [Keep a Changelo
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-08-01
+
+### Changed
+
+- **`build.mjs` is now hidden from local diffs too, not just GitHub pull requests.** 1.0.3 gave it `linguist-vendored`, which is a GitHub-only hint — a human reviewing a PR saw it collapsed, but `git diff` still printed all 348 lines, and that is exactly what an AI agent reads. Adding `-diff` closes the gap: a fresh scaffold's first commit drops from ~690 lines to ~342, which is `game.js` plus a few lines of config.
+
+  `templates/**` deliberately keeps `linguist-vendored` without `-diff`. Helper modules are plausible to tweak while making a game — sounds in `gameFx.js`, sprites in `textureGenerator.js` — and silently swallowing a real edit there would be worse than showing it. `build.mjs` is shared tooling nobody edits by hand, so hiding it outright is safe. If it ever isn't, deleting one line from `.gitattributes` restores normal diffing.
+
 ## [1.0.3] - 2026-08-01
 
 ### Changed
@@ -63,7 +71,8 @@ First release. The repo itself is the plugin: `.claude-plugin/marketplace.json` 
 - `.github/copilot-instructions.md`, which described a repo layout from roughly six months earlier.
 - The `GPT/` ChatGPT package, moved to its own repo at [KilledByAPixel/LittleJS-GPT](https://github.com/KilledByAPixel/LittleJS-GPT) with its history. A marketplace install copies the whole repo, so it was shipping 680KB of unrelated files to everyone installing a game-dev plugin.
 
-[Unreleased]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.0...v1.0.1

@@ -140,9 +140,13 @@ Then fix up the copies:
     # nobody edits it, so hide its contents outright.
     dist/** -diff linguist-vendored
 
-    # Copied verbatim, but you might tweak these later - so collapse them in
-    # review WITHOUT -diff, and a real edit still shows up normally.
-    build.mjs linguist-vendored
+    # Shared build tooling, copied in verbatim and effectively never edited by
+    # hand. -diff as well, so it stays out of local diffs too - not just PRs.
+    build.mjs -diff linguist-vendored
+
+    # Copied verbatim, but these are plausible to tweak while making a game
+    # (sounds in gameFx.js, sprites in textureGenerator.js). Collapse them in
+    # review WITHOUT -diff, so a real edit still shows up normally.
     templates/** linguist-vendored
 
     *.zip binary
