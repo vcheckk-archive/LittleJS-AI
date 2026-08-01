@@ -72,6 +72,10 @@ Copy from `<plugin>` into the project directory:
 3. Each helper module chosen in Step 2 → `./templates/` (only the ones needed, not all of them).
 4. `build.mjs` → project root.
 
+**Copying is tool-agnostic.** Use whatever file mechanism is available — Bash `cp`, PowerShell `Copy-Item`, or reading each file and writing it to the destination. If one mechanism is unavailable or denied, try another. The engine files are large, so prefer a real copy command; fall back to read-and-write only when no copy command is available.
+
+**Never substitute a CDN for the LittleJS engine.** The engine must be a local file in the project's `dist/`. If it genuinely cannot be copied by any available mechanism, STOP and tell the user plainly that the scaffold is incomplete and why (e.g. "the copy was denied — approve file copying, or copy `<plugin>/dist/littlejs.js` to `dist/` yourself"). Do not paper over it with a CDN `<script src>`, and do not leave an empty `dist/` beside an `index.html` pointing somewhere else. The one exception is **three.js** for a 3D game, which is loaded from a CDN by design (as `<plugin>/examples/threejsGame/` already does) — that exception covers three.js only, never LittleJS itself.
+
 Then fix up the copies:
 
 5. `index.html` — retitle, and rewrite script paths (starters use repo-relative paths): `../../dist/littlejs.js` → `dist/littlejs.js`, `../../dist/box2d.wasm.js` → `dist/box2d.wasm.js`, helper modules as `templates/<file>.js`, in dependency order between the engine and `game.js`:
@@ -110,6 +114,8 @@ Then fix up the copies:
    }
    ```
 
+8. **Verify self-containment before declaring done.** Check that `dist/littlejs.js` exists in the project and is non-empty (a real engine file is hundreds of KB, not a stub), and that no `<script src>` in the generated `index.html` points at an external URL — the three.js module import in a 3D game being the only allowed exception. If either check fails, fix it or stop and say so; do not report the game as ready. Say in the reply that the engine is local, e.g. "engine copied to `dist/littlejs.js` — opens from `file://`, no internet needed".
+
 The project is now self-contained: `index.html` opens and plays from `file://` immediately. Building a shippable single-file zip is optional: `npm install` once, then `npm run build` (runs `node build.mjs`, which builds the current folder when it finds `./build.json`).
 
 ## Step 3b — Scaffold (repo mode)
@@ -135,3 +141,5 @@ Then stop and give the standard output: 1-3 line step summary, quick test (open 
 - **Forgetting `"engine"` in a standalone `build.json`** — the default path (`../../dist/littlejs.release.js`) only exists in the repo layout.
 - **`cards.js` before `textureGenerator.js`** — load order matters.
 - **Leaving `../../` paths in a standalone `index.html`** — every `src` must resolve inside the project folder.
+- **Loading the engine from a CDN** (`unpkg`/`jsdelivr`) because a copy failed — the game then needs internet and `dist/` is left empty. Retry the copy with another mechanism, or stop and tell the user. Only three.js may come from a CDN.
+- **Reporting the game as ready without checking `dist/littlejs.js` exists and is non-empty** — an empty `dist/` produces a blank page with no error the user can act on.
