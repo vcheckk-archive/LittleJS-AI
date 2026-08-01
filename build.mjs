@@ -1,6 +1,6 @@
 /**
  * LittleJS Build System (root, config-driven)
- * - Builds any game from games/<gameName>/build.json
+ * - Builds any game from examples/<gameName>/build.json
  * - Concatenates the engine + game source, minifies with terser,
  *   inlines into a single index.html, then zips it.
  *
@@ -11,7 +11,7 @@
  * Build tools (terser, bestzip) are installed once at the repo root:
  *   npm install            (run once after cloning)
  *
- * Per-game config: games/<gameName>/build.json
+ * Per-game config: examples/<gameName>/build.json
  *   {
  *       "title": "My Game",        // optional, defaults to name
  *       "name": "mygame",          // optional, defaults to folder name; output zip is <name>.zip
@@ -31,7 +31,7 @@ import fs from 'node:fs';
 import { execSync } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const GAMES_DIR = join(__dirname, 'games');
+const EXAMPLES_DIR = join(__dirname, 'examples');
 
 function fail(message)
 {
@@ -67,12 +67,12 @@ function buildOne(gameName)
 // build every game that has a build.json; continue past failures, then summarize
 function buildAll()
 {
-    const names = fs.readdirSync(GAMES_DIR)
-        .filter(n => fs.existsSync(join(GAMES_DIR, n, 'build.json')))
+    const names = fs.readdirSync(EXAMPLES_DIR)
+        .filter(n => fs.existsSync(join(EXAMPLES_DIR, n, 'build.json')))
         .sort();
 
     if (!names.length)
-        fail('no games with a build.json found under games/');
+        fail('no games with a build.json found under examples/');
 
     console.log(`Building ${names.length} games: ${names.join(', ')}`);
     console.log('');
@@ -104,13 +104,13 @@ function buildAll()
 // decide whether to abort (single build) or continue (build --all).
 function buildGame(gameName)
 {
-    const gameDir = join(GAMES_DIR, gameName);
+    const gameDir = join(EXAMPLES_DIR, gameName);
     if (!fs.existsSync(gameDir) || !fs.statSync(gameDir).isDirectory())
-        throw new Error(`Game folder not found: games/${gameName}`);
+        throw new Error(`Game folder not found: examples/${gameName}`);
 
     const configPath = join(gameDir, 'build.json');
     if (!fs.existsSync(configPath))
-        throw new Error(`Config not found: games/${gameName}/build.json`);
+        throw new Error(`Config not found: examples/${gameName}/build.json`);
 
     let config;
     try
@@ -119,7 +119,7 @@ function buildGame(gameName)
     }
     catch (e)
     {
-        throw new Error(`Invalid JSON in games/${gameName}/build.json: ${e.message}`);
+        throw new Error(`Invalid JSON in examples/${gameName}/build.json: ${e.message}`);
     }
 
     // apply smart defaults
