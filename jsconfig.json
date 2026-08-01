@@ -4,7 +4,7 @@
     },
     "include": [
         "./dist/littlejs.js",
-        "./games/**/*.js",
+        "./examples/**/*.js",
         "./templates/*.js"
     ],
     "exclude": [

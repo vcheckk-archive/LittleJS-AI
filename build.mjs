@@ -228,7 +228,7 @@ function buildGameDir(gameDir, gameName)
     {
         console.log('Zipping...');
         const sources = ['index.html', ...dataFiles.map(f => basename(f))];
-        execSync(`npx bestzip ../${name}.zip ${sources.join(' ')}`,
+        execSync(`npx bestzip "../${name}.zip" ${sources.map(f => `"${f}"`).join(' ')}`,
             {cwd: BUILD_FOLDER, stdio: 'inherit'});
         console.log(`Size of ${name}.zip: ${fs.statSync(ZIP_PATH).size} bytes`);
     }
@@ -269,7 +269,7 @@ function Build(outputFile, files=[], buildSteps=[])
 function minifyBuildStep(filename)
 {
     console.log('Running terser...');
-    execSync(`npx terser ${filename} -c -m -o ${filename}`, {stdio: 'inherit'});
+    execSync(`npx terser "${filename}" -c -m -o "${filename}"`, {stdio: 'inherit'});
 }
 
 // normalize a <script src> basename for matching against build inputs:
