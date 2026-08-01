@@ -6,6 +6,16 @@ Notable changes to the **littlejs** Claude Code plugin. Follows [Keep a Changelo
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-01
+
+### Fixed
+
+- **`littlejs-conventions` and `new-littlejs-game` silently failed to load when the plugin was installed.** Both descriptions contained a colon followed by a space (`...mistakes are silent: drawCircle...` and `...IS the answer: scaffold...`). In YAML a plain unquoted scalar treats `: ` as the key/value indicator, so the frontmatter failed to parse and the skill was dropped — with no error anywhere. Only the two shortest descriptions, which happened to contain no embedded colon, loaded.
+
+  This is worth knowing about because it does not reproduce under `claude --plugin-dir`, so every pre-release test passed. It surfaced only on a real `plugin install`, and the symptom is indistinguishable from a badly-worded trigger: asking for a game just produced "which tech stack do you want?"
+
+  **If you write a skill description, keep `: ` out of it.** Use a dash or a semicolon instead.
+
 ## [1.0.0] - 2026-08-01
 
 First release. The repo itself is the plugin: `.claude-plugin/marketplace.json` points at the repo root, so `dist/`, `templates/`, `examples/`, `reference.md`, and `build.mjs` ship as payload and the engine travels with the plugin.
@@ -33,5 +43,6 @@ First release. The repo itself is the plugin: `.claude-plugin/marketplace.json` 
 - `.github/copilot-instructions.md`, which described a repo layout from roughly six months earlier.
 - The `GPT/` ChatGPT package, moved to its own repo at [KilledByAPixel/LittleJS-GPT](https://github.com/KilledByAPixel/LittleJS-GPT) with its history. A marketplace install copies the whole repo, so it was shipping 680KB of unrelated files to everyone installing a game-dev plugin.
 
-[Unreleased]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/KilledByAPixel/LittleJS-AI/releases/tag/v1.0.0

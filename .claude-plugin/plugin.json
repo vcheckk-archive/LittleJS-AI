@@ -1,6 +1,6 @@
 {
     "name": "littlejs",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Build playable LittleJS games with AI: engine conventions and pitfalls, one-command game scaffolding with the engine bundled, API reference lookup, and atlas shape art.",
     "author": { "name": "Frank Force", "url": "https://github.com/KilledByAPixel" },
     "homepage": "https://github.com/KilledByAPixel/LittleJS-AI",

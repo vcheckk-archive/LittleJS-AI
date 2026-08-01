@@ -191,6 +191,15 @@ This repo is also a Claude Code plugin
   a `CHANGELOG.md` entry, in the same commit.** The plugin cache is keyed by version: without a
   bump, already-installed users receive nothing, no matter what you push.
 - Run `claude plugin validate .` after touching either manifest.
+- **NEVER put a colon-followed-by-space inside a SKILL.md `description:`.** YAML reads `: ` in an
+  unquoted scalar as the key/value indicator, so the frontmatter fails to parse and the skill is
+  silently dropped — no error, it just never loads. Use a dash or semicolon instead. This bit us in
+  1.0.0 and cost two of four skills. It does NOT reproduce under `claude --plugin-dir`, only on a
+  real `plugin install`, so `--plugin-dir` testing will not catch it. Audit with:
+  `awk '/^description:/{print}' skills/*/SKILL.md | grep -o ': ' | wc -l` — must equal the number
+  of skills (one `description: ` prefix each, nothing more).
+- Verifying skills load: do not trust a session's self-reported skill list, which is unreliable.
+  Test functionally — ask for a game and see whether it scaffolds.
 
 Notes
 - `reference.md` documents major LittleJS API surface.
