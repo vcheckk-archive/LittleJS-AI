@@ -38,7 +38,7 @@ All are pure white, so `drawTile`'s color arg multiplies to any hue. `glow` and 
 let icons;
 function gameInit()
 {
-    saveDataInit('MyGame');     // if you persist anything (CLAUDE.md rule)
+    saveDataInit('MyGame');     // if you persist anything
     icons = initDefaultAtlas(); // 16 white icons into tiles 0-15, halo already fixed
 }
 ```
@@ -55,7 +55,7 @@ function gameRender()
 
 ## Tinting & glow
 
-White icon × `color` = that color, no per-instance canvas state. For additive glow, pass `additiveColor` with **alpha 0** (repo rule — non-zero alpha thickens the silhouette). Note the arg order — `angle` and `mirror` come first:
+White icon × `color` = that color, no per-instance canvas state. For additive glow, pass `additiveColor` with **alpha 0** — non-zero alpha thickens the silhouette. Note the arg order — `angle` and `mirror` come first:
 
 ```javascript
 drawTile(e.pos, vec2(e.size), icons.glow, e.color, 0, false, new Color(1,1,1,0));
