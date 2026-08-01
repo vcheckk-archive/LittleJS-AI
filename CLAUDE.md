@@ -106,13 +106,16 @@ Project constraints
 UI and helper modules
 - Use `templates/menus.js` for front-end menu UI (title/pause/options/dialogs/toolbars).
 - Do not hand-roll DOM menu systems when `menus.js` already covers it.
-- Use `SoundGenerator` and screen-shake helpers from `templates/gameFx.js`.
-- Use `templates/textureGenerator.js` for generated texture atlases.
+- Use `SoundGenerator` and screen-shake helpers from `templates/gameFx.js` — they live in that
+  module, not the engine, so the game must load it before calling them.
+- Use `templates/textureGenerator.js` for generated texture atlases; its helpers (e.g.
+  `initDefaultAtlas`) require loading that module.
 - Use `templates/tweakables.js` for runtime tweak controls and persistence.
 
 Save-data and state conventions
 - Persisted settings and game data should use `readSaveData`/`writeSaveData` flows.
-- Call `saveDataInit('GameName')` at the top of `gameInit` before menu/tweak/medal setup.
+- `saveDataInit('GameName')` comes from `templates/menus.js`, not the engine — only call it in a
+  game that loads that module, at the top of `gameInit` before menu/tweak/medal setup.
 - Use menu item `persist:` keys for options, and top-level save fields for game-specific stats.
 
 LittleJS best-practice rules
@@ -164,7 +167,7 @@ Common pitfalls
 - With three.js, `await import(...)` the module at the top of `gameInit` before creating
   `ThreeJSPlugin` or any `THREE.*` objects.
 - Do not redefine built-in math shortcuts.
-- Do not write custom WebAudio code when `SoundGenerator` is appropriate.
+- Do not write custom WebAudio code when `SoundGenerator` (from `templates/gameFx.js`) is appropriate.
 - Keep `\n` as string escapes in text literals; do not convert to actual line breaks.
 - `ParticleEmitter.speed` is units per frame, not per second.
 

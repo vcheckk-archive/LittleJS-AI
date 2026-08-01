@@ -38,7 +38,6 @@ All are pure white, so `drawTile`'s color arg multiplies to any hue. `glow` and 
 let icons;
 function gameInit()
 {
-    saveDataInit('MyGame');     // if you persist anything
     icons = initDefaultAtlas(); // 16 white icons into tiles 0-15, halo already fixed
 }
 ```

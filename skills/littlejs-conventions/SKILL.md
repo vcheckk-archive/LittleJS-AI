@@ -30,6 +30,7 @@ class Player extends EngineObject
 
 Spawn once in `gameInit` with `new Player(vec2(0))`; it draws itself — no manual draw call. Customize visuals via `this.tileInfo` / `this.color` / `this.angle`, or override `render()`.
 - Persisted settings/stats: use `readSaveData`/`writeSaveData` (localStorage-backed, JSON-serialized) — don't hand-roll localStorage.
+- **three.js 3D** (the engine's built-in `ThreeJSPlugin` / `ThreeJSObject`): three.js itself is not bundled. Declare `let THREE;` at top level and `THREE = await import(...)` at the top of an async `gameInit`, then `new ThreeJSPlugin(THREE)` — construct no `THREE.*` object before that import resolves (no top-level `new THREE.Vector3(...)`). Never declare `let threeJS` in game code: the engine owns that global and the plugin constructor assigns it, so redeclaring it throws. Call `setGLEnable(false)` so the LittleJS canvas draws only Canvas2D content (HUD text, particles) over the 3D scene.
 
 ## Never shadow engine globals
 

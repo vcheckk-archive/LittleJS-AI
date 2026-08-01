@@ -19,7 +19,7 @@ Scaffold a new playable LittleJS game by copying the closest **example game** ou
 
 Two modes; check once:
 
-- **Repo mode** — the working directory is a clone of the LittleJS-AI repo (it has `build.mjs`, `templates/`, and `dist/littlejs.js`). Scaffold into `examples/<name>/` with `../../` script paths, exactly as the repo's own games do. Do NOT copy engine/template files — the clone already has them.
+- **Repo mode** — the working directory is a clone of the LittleJS-AI repo (it has `examples/emptyGame/` and `reference.md`). Scaffold into `examples/<name>/` with `../../` script paths, exactly as the repo's own games do. Do NOT copy engine/template files — the clone already has them.
 - **Standalone mode** (the normal case for plugin users) — any other directory. Copy everything the game needs from `<plugin>` into the project so it is fully self-contained. If the working directory is empty (or only has dotfiles/README), scaffold directly into it; otherwise create `./<name>/` and scaffold there.
 
 ## Step 1 — Up to 3 quick questions (never blocking)
@@ -115,6 +115,14 @@ Then fix up the copies:
    ```
 
 8. **Verify self-containment before declaring done.** Check the byte size of `dist/littlejs.js`, not just its existence: a real engine is several hundred KB, so anything under ~100KB means a truncated or failed copy, not a working engine — stop and report that, don't declare the game ready. Also confirm no `<script src>` in the generated `index.html` points at an external URL — the three.js module import in a 3D game being the only allowed exception. If either check fails, fix it or stop and say so; do not report the game as ready. Say in the reply that the engine is local, e.g. "engine copied to `dist/littlejs.js` — opens from `file://`, no internet needed".
+
+9. Write a `.gitignore` at the project root so the optional build doesn't litter the project:
+
+   ```gitignore
+   build/
+   *.zip
+   node_modules/
+   ```
 
 The project is now self-contained: `index.html` opens and plays from `file://` immediately. Building a shippable single-file zip is optional: `npm install` once, then `npm run build` (runs `node build.mjs`, which builds the current folder when it finds `./build.json`).
 
