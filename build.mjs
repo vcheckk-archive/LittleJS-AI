@@ -7,6 +7,9 @@
  * Usage (from repo root):
  *   node build.mjs <gameName>     build one game
  *   node build.mjs --all          build every game that has a build.json
+ *   node build.mjs                (no args) build the current working
+ *                                  directory if it contains a build.json
+ *                                  (standalone project mode)
  *
  * Build tools (terser, bestzip) are installed once at the repo root:
  *   npm install            (run once after cloning)
@@ -41,13 +44,14 @@ function fail(message)
 
 // dispatch on the CLI argument
 const arg = process.argv[2];
-if (!arg)
-    fail('usage: node build.mjs <gameName> | --all');
-
 if (arg === '--all' || arg === 'all')
     buildAll();
-else
+else if (arg)
     buildOne(arg);
+else if (fs.existsSync(join(process.cwd(), 'build.json')))
+    buildHere();
+else
+    fail('usage: node build.mjs <gameName> | --all (or run from a folder containing build.json)');
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -57,6 +61,19 @@ function buildOne(gameName)
     try
     {
         buildGame(gameName);
+    }
+    catch (e)
+    {
+        fail(e.message);
+    }
+}
+
+// build the current working directory as a standalone game folder
+function buildHere()
+{
+    try
+    {
+        buildGameDir(process.cwd(), basename(process.cwd()));
     }
     catch (e)
     {
@@ -107,10 +124,16 @@ function buildGame(gameName)
     const gameDir = join(EXAMPLES_DIR, gameName);
     if (!fs.existsSync(gameDir) || !fs.statSync(gameDir).isDirectory())
         throw new Error(`Game folder not found: examples/${gameName}`);
+    buildGameDir(gameDir, gameName);
+}
 
+// Build one game from its folder. Throws Error on any failure so callers can
+// decide whether to abort (single build) or continue (build --all).
+function buildGameDir(gameDir, gameName)
+{
     const configPath = join(gameDir, 'build.json');
     if (!fs.existsSync(configPath))
-        throw new Error(`Config not found: examples/${gameName}/build.json`);
+        throw new Error(`Config not found: ${configPath}`);
 
     let config;
     try
@@ -119,7 +142,7 @@ function buildGame(gameName)
     }
     catch (e)
     {
-        throw new Error(`Invalid JSON in examples/${gameName}/build.json: ${e.message}`);
+        throw new Error(`Invalid JSON in ${configPath}: ${e.message}`);
     }
 
     // apply smart defaults
