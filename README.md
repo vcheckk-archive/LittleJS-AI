@@ -33,7 +33,7 @@ The plugin ships four skills:
 - `littlejs-api` — exact API signature lookup from the bundled reference
 - `atlas-shape-art` — fast recolorable shape sprites from the built-in atlas
 
-Cloning this repo is only needed for browsing the templates by hand or for the GPT workflow above — the plugin bundles everything else.
+Cloning this repo is only needed for browsing the templates by hand — the plugin bundles everything else.
 
 **Developing the plugin itself?** Load it from your working tree with `claude --plugin-dir .` (then `/reload-plugins` after edits). Don't `/plugin install` your local copy — that installs a frozen snapshot. When bumping the engine in `dist/`, also refresh `reference.md` by hand and bump `version` in `.claude-plugin/plugin.json`, or installed users never receive the update.
 
@@ -46,7 +46,7 @@ LittleJS and everything in this repository is **MIT licensed!** See [LICENSE](LI
 - [LittleJS Engine](https://github.com/KilledByAPixel/LittleJS) — the main LittleJS repository
 - [LittleJS Arcade](https://killedbyapixel.github.io/LittleJSArcade/) — 50+ finished games built with these tools, in their own repo ([source](https://github.com/KilledByAPixel/LittleJSArcade))
 - [Templates Folder](templates/) — starting templates and reusable components
-- [LittleJS GPT AI](https://chatgpt.com/g/g-67c7c080b5bc81919736bc8815836be6-littlejs-game-maker) — use ChatGPT to make games without writing any code
+- [LittleJS GPT AI](https://chatgpt.com/g/g-67c7c080b5bc81919736bc8815836be6-littlejs-game-maker) — use ChatGPT to make games without writing any code ([source](https://github.com/KilledByAPixel/LittleJS-GPT))
 
 ## 🛠️ Make Your Own
 
