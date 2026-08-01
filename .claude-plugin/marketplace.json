@@ -2,14 +2,14 @@
     "name": "littlejs-ai",
     "owner": { "name": "Frank Force", "url": "https://github.com/KilledByAPixel" },
     "metadata": {
-        "description": "Build playable LittleJS games with Claude: engine conventions, new-game scaffolding, API reference, and shape art."
+        "description": "Make games and graphics-heavy apps with LittleJS, a fast open-source HTML5 engine."
     },
     "plugins": [
         {
             "name": "littlejs",
             "source": "./",
-            "description": "Make HTML5 games with the LittleJS engine. Scaffolds a complete playable project with the engine bundled - no clone, no npm install, no server - and applies the engine's conventions and hard-won pitfalls to any LittleJS code you write.",
-            "version": "1.0.1",
+            "description": "Make games and graphics-heavy apps with LittleJS, a fast open-source HTML5 engine. Ask for a game and get a complete playable project in seconds - 2D, Box2D physics, or three.js 3D - that runs by opening a file, with nothing to install. Keeps your code idiomatic as the project grows.",
+            "version": "1.0.2",
             "author": { "name": "Frank Force", "url": "https://github.com/KilledByAPixel" },
             "homepage": "https://github.com/KilledByAPixel/LittleJS-AI",
             "repository": "https://github.com/KilledByAPixel/LittleJS-AI",

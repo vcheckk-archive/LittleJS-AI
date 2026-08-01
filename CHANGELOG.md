@@ -6,6 +6,18 @@ Notable changes to the **littlejs** Claude Code plugin. Follows [Keep a Changelo
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-08-01
+
+### Changed
+
+- **Scaffolded projects now mark the vendored engine as vendored.** New projects get a `.gitattributes` with `dist/** -diff linguist-vendored`. Without it the engine lands in the first commit as ~640KB of apparently-new code, and every later reviewer — human or AI — treats it as project source to read and verify. One real session spent its effort on *"let me verify the copy is byte-identical myself so the reviewer doesn't have to line-read 650KB of third-party code."* Now `git diff` reports `Binary files differ` and GitHub collapses it in pull requests. The skill also states outright that the engine must never be reviewed, diffed, or summarized.
+- **Only one engine build is vendored.** Projects previously received both `littlejs.js` and `littlejs.release.js` (~640KB each) although nothing ever loaded the second. Now just `littlejs.js`, with `build.json` pointing at it — half the footprint, no functional loss. Copy `littlejs.release.js` in by hand if you want the smallest possible jam build.
+- Plugin and marketplace descriptions rewritten to say what the plugin is for rather than enumerate engine trivia, and to mention Box2D physics and three.js 3D support.
+
+### Added
+
+- A `.gitattributes` in this repo, for the same reason: `dist/` is a vendored engine build and should not appear in review.
+
 ## [1.0.1] - 2026-08-01
 
 ### Fixed
@@ -43,6 +55,7 @@ First release. The repo itself is the plugin: `.claude-plugin/marketplace.json` 
 - `.github/copilot-instructions.md`, which described a repo layout from roughly six months earlier.
 - The `GPT/` ChatGPT package, moved to its own repo at [KilledByAPixel/LittleJS-GPT](https://github.com/KilledByAPixel/LittleJS-GPT) with its history. A marketplace install copies the whole repo, so it was shipping 680KB of unrelated files to everyone installing a game-dev plugin.
 
-[Unreleased]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/KilledByAPixel/LittleJS-AI/releases/tag/v1.0.0
