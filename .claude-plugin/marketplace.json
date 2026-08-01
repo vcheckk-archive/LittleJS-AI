@@ -1,0 +1,12 @@
+{
+    "name": "littlejs-ai",
+    "owner": { "name": "Frank Force", "url": "https://github.com/KilledByAPixel" },
+    "plugins": [
+        {
+            "name": "littlejs",
+            "source": "./",
+            "description": "LittleJS game development: engine conventions, game scaffolding, API reference, shape art",
+            "category": "gamedev"
+        }
+    ]
+}
