@@ -15,7 +15,29 @@ The 50+ finished games built with these tools live in their own repo: the **[Lit
 
 ### Want to make a game without writing code? Try the [LittleJS GPT!](https://chatgpt.com/g/g-67c7c080b5bc81919736bc8815836be6-littlejs-game-maker)
 
-For advanced users, LittleJS also works great with tools like GitHub Copilot, Codex, and Cursor.
+## 🤖 Claude Code Plugin
+
+Use LittleJS AI directly inside [Claude Code](https://claude.com/claude-code) — **no clone required**. Install once:
+
+```
+/plugin marketplace add KilledByAPixel/LittleJS-AI
+/plugin install littlejs@littlejs-ai
+```
+
+Then in any empty folder, ask for a game ("make me a breakout game"). Claude scaffolds a complete project — engine included — that opens straight from `file://` with no server and no npm install.
+
+The plugin ships four skills:
+
+- `littlejs-conventions` — engine rules and pitfalls, applied automatically to any LittleJS code
+- `new-littlejs-game` — scaffolds a complete playable game project
+- `littlejs-api` — exact API signature lookup from the bundled reference
+- `atlas-shape-art` — fast recolorable shape sprites from the built-in atlas
+
+Cloning this repo is only needed for browsing the templates by hand or for the GPT workflow above — the plugin bundles everything else.
+
+**Developing the plugin itself?** Load it from your working tree with `claude --plugin-dir .` (then `/reload-plugins` after edits). Don't `/plugin install` your local copy — that installs a frozen snapshot. When bumping the engine in `dist/`, also refresh `reference.md` by hand and bump `version` in `.claude-plugin/plugin.json`, or installed users never receive the update.
+
+For other tools, LittleJS also works great with GitHub Copilot, Codex, and Cursor.
 
 LittleJS and everything in this repository is **MIT licensed!** See [LICENSE](LICENSE) for details.
 
