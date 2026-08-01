@@ -14,7 +14,7 @@ For shape-based LittleJS games, bake the 16 built-in white icons ONCE with `init
 - New game whose look is geometric/abstract/neon/puzzle/arcade, or has lots of round/polygon entities (orbs, gems, bubbles, asteroids, stars, particles-as-entities).
 - **Retrofit:** an existing game calling many `drawCircle`/`drawEllipse`/`drawPoly`/`drawRegularPoly` per frame and the rendering is a hot spot.
 
-**Not for:** representational art (a specific character, a detailed prop) — that's a custom sprite, use the `iterate-sprite` skill. A handful of shapes drawn once is fine as-is; this is for *many* instances or a shape-driven art style.
+**Not for:** representational art (a specific character, a detailed prop) — draw that as a custom sprite with `drawToTexture`. A handful of shapes drawn once is fine as-is; this is for *many* instances or a shape-driven art style.
 
 ## Why it's faster (don't skip — agents get this wrong)
 
@@ -30,7 +30,7 @@ All are pure white, so `drawTile`'s color arg multiplies to any hue. `glow` and 
 
 ## Quick start
 
-1. Wire `templates/textureGenerator.js` — a `<script>` tag in `index.html` (after the engine, before `game.js`) AND a `sources` entry in `build.json`. From `games/<name>/` the path is `../../templates/textureGenerator.js`.
+1. Wire `textureGenerator.js` — a `<script>` tag in `index.html` (after the engine, before `game.js`) AND a `sources` entry in `build.json` if the project has one. If the project doesn't already contain it, copy it from this plugin: `${CLAUDE_SKILL_DIR}/../../templates/textureGenerator.js` → the project's `templates/` folder (create it), then load it with `<script src=templates/textureGenerator.js></script>`. In a clone of the LittleJS-AI repo, games under `examples/<name>/` load it as `../../templates/textureGenerator.js` instead — never copy it there.
 
 2. Bake the atlas once in `gameInit` and keep the returned name→TileInfo map:
 
@@ -81,4 +81,4 @@ drawTile(e.pos, vec2(e.size), icons.glow, e.color, 0, false, new Color(1,1,1,0))
 - **`useWebGL=false` or passing a 2D `context`** — drops you onto canvas2D and off the GPU batch. Omit those args.
 - **Treating size as a radius** — it's the full diameter/quad size.
 - **Custom sprites too?** Call `initDrawToTexture(8)` first, then `initDefaultAtlas()` reuses it and leaves tiles 16+ free for your own `drawToTexture` art.
-- Standard repo rules still apply: global API (no `LJS.` prefix), no ES imports, 4-space indent.
+- Standard LittleJS conventions still apply: global API (no `LJS.` prefix), no ES imports, 4-space indent.
