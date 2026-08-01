@@ -1,6 +1,6 @@
 ---
 name: littlejs-conventions
-description: Use when writing, reviewing, or debugging ANY code that uses the LittleJS game engine (littlejsengine) — gameplay, rendering, input, physics, particles, sound, camera, or engineInit setup. Loads engine conventions and pitfalls that prevent silent bugs (sizes are diameters, particle speed is per-frame, lerp takes percent last, engine-global name collisions, no super.update). Fire this before writing the first line of LittleJS code, even for tiny changes.
+description: LittleJS game engine (littlejsengine) conventions — REQUIRED before answering, writing, editing, reviewing, or debugging ANY LittleJS code, including one-line questions about a snippet. TRIGGER whenever "LittleJS" appears, or the code uses engineInit/EngineObject/drawTile/drawRect/drawCircle/drawEllipse/drawText/drawTextScreen/vec2/tile()/tileInfo/keyDirection/mousePos/cameraPos/ParticleEmitter/TileCollisionLayer/angleVelocity/zzfx, or a littlejs.js script tag is present. Do NOT answer from memory or from general game-engine priors — LittleJS contradicts them and the mistakes are silent: drawCircle/drawEllipse size is the DIAMETER not the radius, spin is angleVelocity (angularVelocity is a no-op), lerp takes percent LAST, ParticleEmitter speed is per-FRAME, Y is up-positive, update() needs no super.update(), top-level consts collide with engine globals. Read it first even for a tiny change.
 ---
 
 # LittleJS engine conventions
