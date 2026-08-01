@@ -199,7 +199,24 @@ This repo is also a Claude Code plugin
   `awk '/^description:/{print}' skills/*/SKILL.md | grep -o ': ' | wc -l` — must equal the number
   of skills (one `description: ` prefix each, nothing more).
 - Verifying skills load: do not trust a session's self-reported skill list, which is unreliable.
-  Test functionally — ask for a game and see whether it scaffolds.
+  Test functionally — ask for a game and see whether it scaffolds. Also avoid appending
+  "name any skills you consulted" to a test prompt; it shifts the model into meta-reflection and
+  it stops doing the task, which looks exactly like the skill failing to fire.
+
+Editing the skills in this repo (read this before touching `skills/`)
+- If the published plugin is installed (`claude plugin list` shows `littlejs@littlejs-ai`), the
+  cached copy under `~/.claude/plugins/cache/` is what actually runs — including in this repo.
+  Your edits to `skills/` change nothing until you reinstall, so it is easy to "fix" something,
+  see no change, and chase a ghost.
+- While working on skills: `claude plugin disable littlejs`, then load the working tree with
+  `claude --plugin-dir .` (forward slashes in the path — backslashes silently load nothing) and
+  `/reload-plugins` after each edit. Run `claude plugin enable littlejs` when you are done.
+- `--plugin-dir` is for iterating, NOT for final verification: it is more lenient than the real
+  loader and will not catch a malformed frontmatter (see the colon rule above). Before shipping,
+  push, then `claude plugin uninstall littlejs` / `claude plugin marketplace update littlejs-ai` /
+  `claude plugin install littlejs@littlejs-ai`, and re-test against that genuine install.
+- `/plugin` slash commands do not exist in the VS Code extension. The `claude plugin ...` CLI
+  forms work anywhere.
 
 Notes
 - `reference.md` documents major LittleJS API surface.
