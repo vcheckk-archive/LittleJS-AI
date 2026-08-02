@@ -177,7 +177,20 @@ Do not report a game as ready on the strength of having written it. At minimum, 
 
 **To see it run, serve it over HTTP — do not rely on `file://` yourself.** The `file://` promise is real for the user opening the page in their own browser, but an agent preview pane commonly renders `file://` as a static snapshot: the engine and helper scripts execute while `game.js` does not. The failure signature is genuinely misleading — hoisted functions exist but classes and consts are `undefined`, the canvas is 0x0, and the engine throws something unrelated-looking like `Constructed Vector2 is invalid`. That is not a bug in your game. Serve the folder (`npx serve`, `python -m http.server`, or a VS Code launch config) and load it over `http://localhost`.
 
-If you need to drive the game programmatically to check something, expose a few hooks on `window` from `game.js` for the session and say so in your summary. Note the engine limitation: `engineUpdate` is private to `engineInit`, so there is no supported way to advance a single frame headlessly, and anything driven by `Timer` or elapsed `time` cannot be stepped — verify those by playing rather than by scripting.
+If you need to drive the game programmatically to check something, expose a few hooks on `window` from `game.js` for the session and say so in your summary.
+
+**Time-driven logic can be checked deterministically** (engine 1.18.25+). Anything on a `Timer`, a spawn interval, or a cooldown is otherwise unverifiable without sitting and watching, so when correctness depends on elapsed time, use the engine's headless stepping instead of guessing:
+
+```javascript
+setHeadlessMode(true);      // no rendering, audio, or input
+setEngineManualStep(true);  // engine stops driving itself with requestAnimationFrame
+await engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost);
+
+engineStep(600);            // advance exactly 10 seconds of game time at 60fps
+// now assert: did obstacles spawn? did the cooldown expire?
+```
+
+Both flags must be set BEFORE `engineInit`, one `engineStep(n)` runs exactly `n` fixed updates at `timeScale` 1, and `engineStep` respects `paused` the same way the normal loop does. This needs a small harness that loads the engine outside the browser, so reach for it when time-dependent behaviour is the thing in doubt — not for every game. Grep `reference.md` for "Headless testing" via the **littlejs-api** skill for the full contract.
 
 Then stop and give the standard output: 1-3 line step summary, quick test for the user (open `index.html` directly — no server needed on their end — with expected result + controls), what you verified and how, and 2-4 next-step options.
 

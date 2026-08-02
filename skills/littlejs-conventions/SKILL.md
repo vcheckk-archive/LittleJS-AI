@@ -57,7 +57,8 @@ Engine globals share top-level scope with game scripts. A top-level `let`/`const
 - `drawText` is world-space (size ~3 is normal); `drawTextScreen` is pixel/screen-space (size ~80 is normal). Don't mix them up.
 - Spin uses `angleVelocity` / `angleDamping` — the standard-sounding `angularVelocity` is a silent no-op.
 - For additive glow, the `additiveColor` argument needs **alpha 0** (e.g. `new Color(1,1,0,0)`); non-zero alpha thickens the silhouette.
-- `readSaveData(key, default)` merges with object spread, so the default must be an OBJECT. A scalar default returns `{}` and turns into `NaN` downstream, silently.
+- `readSaveData(key, default)` merges with object spread, so the default must be an OBJECT. A scalar default returns `{}` and turns into `NaN` downstream, silently. (Engine 1.18.25+ asserts on a scalar default in debug builds; release builds still fail quietly, so pass an object regardless.)
+- Time-driven logic is testable: `setHeadlessMode(true)` plus `setEngineManualStep(true)` before `engineInit` stop the engine self-driving, and `engineStep(frames)` then advances exactly that many fixed updates. Use it instead of guessing whether a `Timer` or spawn interval fired.
 - Keep `\n` as a two-character escape inside string literals; don't convert to real line breaks.
 - A typical view is roughly 35x20 world units at the default camera scale. If you need a specific framing, set it explicitly with `setCameraScale` rather than guessing entity sizes against an unknown viewport.
 - Don't redefine the engine's math shortcuts or color constants (see the shadowing list above).

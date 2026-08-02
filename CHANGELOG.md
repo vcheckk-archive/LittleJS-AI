@@ -6,6 +6,23 @@ Notable changes to the **littlejs** Claude Code plugin. Follows [Keep a Changelo
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-08-01
+
+Ships engine **1.18.25**, which closes both gaps this plugin's feedback surfaced upstream.
+
+### Fixed
+
+- **The scaffolding skill stated a limitation that no longer exists.** It told agents `engineUpdate` is private to `engineInit`, so a frame could not be advanced headlessly and `Timer`-driven logic could not be verified. That was true through 1.18.24 and is now false — leaving it in would have stopped anyone using the capability that was added because of this exact complaint.
+
+### Added
+
+- **Deterministic headless stepping, in the engine.** `setEngineManualStep(true)` stops the engine driving itself with `requestAnimationFrame`, and `engineStep(frames)` then advances exactly that many fixed updates. Paired with `setHeadlessMode(true)`, time-driven behaviour — `Timer`, spawn intervals, cooldowns — becomes testable rather than something you verify by watching.
+
+  Measured against the shipped build, not assumed: 100 consecutive `engineStep(1)` calls produced exactly 100 updates with zero drift, `engineStep(60)` exactly 60, `engineStep(0)` nothing, `frame` matched the update count exactly, and 10 steps while `paused` advanced nothing. The engine also does not self-drive in manual mode.
+
+  Both the scaffolding skill's verification step and `littlejs-conventions` now point at it, and `reference.md` documents the full contract under "Headless testing".
+- **`readSaveData` now asserts on a scalar default** in debug builds, catching the silent `NaN` that 1.0.5 could only warn about. The conventions skill still carries the guidance, since `ASSERT` is stripped from release builds — the assert catches the mistake, the skill prevents it.
+
 ## [1.0.5] - 2026-08-01
 
 Changes from real-world feedback after building a game with 1.0.4.
@@ -88,7 +105,8 @@ First release. The repo itself is the plugin: `.claude-plugin/marketplace.json` 
 - `.github/copilot-instructions.md`, which described a repo layout from roughly six months earlier.
 - The `GPT/` ChatGPT package, moved to its own repo at [KilledByAPixel/LittleJS-GPT](https://github.com/KilledByAPixel/LittleJS-GPT) with its history. A marketplace install copies the whole repo, so it was shipping 680KB of unrelated files to everyone installing a game-dev plugin.
 
-[Unreleased]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.5...HEAD
+[Unreleased]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.6...HEAD
+[1.0.6]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.2...v1.0.3
