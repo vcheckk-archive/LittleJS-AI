@@ -26,6 +26,53 @@ timeDelta             // Time between updates (1/60)
 timeScale = 1         // Scales deltaTime applied to the game
 paused                // Is the game paused? (set with setPaused)
 headlessMode = false  // Run without rendering for testing/servers (set before engineInit)
+engineManualStep      // Advance only via engineStep, default false (set before engineInit)
+engineStep(frames=1)  // Advance the engine manually, needs engineManualStep
+```
+
+### Headless testing
+
+`headlessMode` disables rendering, audio, and input. `engineManualStep` additionally
+stops the engine driving itself with `requestAnimationFrame`, so it only advances when
+you call `engineStep`. Together they make time-driven game logic deterministic and testable —
+`Timer`, time-based spawns, cooldowns, and physics all advance exactly as many frames as you
+ask for. `engineStep` drives the real update loop, so `timeScale` scales fixed updates per
+step just as it does under `requestAnimationFrame`: at `timeScale = .5`, ten steps run five
+fixed updates. Leave `timeScale` at 1 when you want frame counts to match exactly.
+
+```javascript
+setHeadlessMode(true);        // no rendering, audio, or input
+setEngineManualStep(true);    // no requestAnimationFrame loop
+await engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost);
+
+// In manual step mode engineInit runs gameInit but no update frame, so this
+// is where you assert on what initialization produced.
+engineStep();                 // advance exactly one fixed update
+engineStep(600);              // advance 10 seconds of game time at 60fps (timeScale 1)
+
+// engineStep respects paused, exactly as the normal update loop does
+setPaused(true);
+engineStep(5);                // gameUpdatePost runs, time and frame do not advance
+```
+
+Both settings must be set before `engineInit`. Input is not synthesized in headless
+mode, so tests drive game state directly rather than through `keyIsDown` and friends.
+
+`engineStep` is synchronous and does not yield — every frame runs back to back before
+it returns. That is what makes it deterministic, and in headless mode it is what you
+want. Outside headless mode each step also renders, so a large count blocks the tab
+and throws away every frame but the last. To advance a lot of time while staying
+responsive, chunk it yourself and let the browser paint between chunks:
+
+```javascript
+// advance 10 minutes of game time without freezing the tab
+let remaining = 36000;
+(function chunk()
+{
+    engineStep(min(remaining, 60));
+    if ((remaining -= 60) > 0)
+        requestAnimationFrame(chunk);
+})();
 ```
 
 ## LittleJS Utilities Classes and Functions
@@ -83,7 +130,7 @@ noise1D(x)                            // Smooth 1D value noise (-1 to 1)
 noise2D(x, y)                         // Smooth 2D value noise (-1 to 1)
 fetchJSON(url)                        // Fetch and parse a JSON file (async)
 shareURL(title, url, callback)        // Share a URL via the navigator share API
-readSaveData(saveName, defaultSaveData) // Read game save data from localStorage
+readSaveData(saveName, defaultSaveData) // Read game save data from localStorage, default must be an object
 writeSaveData(saveName, saveData)     // Write game save data to localStorage
 
 // Random functions

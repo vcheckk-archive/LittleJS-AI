@@ -35,7 +35,7 @@ const engineName = 'LittleJS';
  *  @type {string}
  *  @default
  *  @memberof Engine */
-const engineVersion = '1.18.24';
+const engineVersion = '1.18.25';
 
 /** Frames per second to update
  *  @type {number}
@@ -92,6 +92,7 @@ function setPaused(isPaused=true) { paused = isPaused; }
 
 // Engine internal variables
 let frameTimeLastMS = 0, frameTimeBufferMS = 0, averageFPS = 0;
+let engineUpdateInternal; // assigned by engineInit so engineStep can drive it
 let showEngineVersion = true;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -280,7 +281,8 @@ async function engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, game
 
         if (!debugVideoCaptureIsActive())
             renderFrame();
-        requestAnimationFrame(engineUpdate);
+        if (!engineManualStep)
+            requestAnimationFrame(engineUpdate);
 
         function renderFrame()
         {
@@ -308,6 +310,7 @@ async function engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, game
             primitiveCount = 0;
         }
     }
+    engineUpdateInternal = engineUpdate;
 
     function updateCanvas()
     {
@@ -462,8 +465,37 @@ async function engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, game
     {
         // wait for gameInit to load
         await gameInit();
-        engineUpdate();
+        engineManualStep || engineUpdate();
     }
+}
+
+// max frames engineStep can advance in one call, 10 minutes at 60fps
+// large counts block until they finish, so this catches runaway values
+const engineStepMaxFrames = 36000;
+
+/** Advance the engine by a number of frames
+ *  Requires setEngineManualStep(true) before engineInit
+ *  Respects paused exactly as the normal update loop does
+ *  @param {number} [frames] - number of engine update ticks, max 36000, each running one fixed update at timeScale 1
+ *  @example
+ *  setHeadlessMode(true);
+ *  setEngineManualStep(true);
+ *  await engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost);
+ *  engineStep(600); // advance 10 seconds of game time
+ *  @memberof Engine */
+function engineStep(frames=1)
+{
+    ASSERT(engineManualStep,
+        'engineStep requires setEngineManualStep(true) before engineInit');
+    ASSERT(engineUpdateInternal, 'engineStep requires engineInit to complete');
+    // runtime guard so release builds (where the asserts are stripped) can't
+    // start a second requestAnimationFrame chain or call an undefined update
+    if (!engineManualStep || !engineUpdateInternal) return;
+    ASSERT(Number.isInteger(frames) && frames >= 0 && frames <= engineStepMaxFrames,
+        'engineStep requires a whole frame count from 0 to ' + engineStepMaxFrames);
+    frames = min(frames, engineStepMaxFrames); // release has no asserts, don't freeze
+    for (let i = frames; i > 0; --i)
+        engineUpdateInternal(frameTimeLastMS + 1e3 / frameRate);
 }
 
 /** Update each engine object, remove destroyed objects, and update time
@@ -2688,12 +2720,17 @@ function shareURL(title, url, callback)
 
 /** Read save data from local storage
  *  @param {string} saveName - unique name for the game/save
- *  @param {Object} [defaultSaveData] - default values for save
+ *  @param {Object} [defaultSaveData] - default values, result is {...default, ...loaded} so this must be an object
  *  @return {Object}
  *  @memberof Utilities */
 function readSaveData(saveName, defaultSaveData)
 {
-    ASSERT(isStringLike(saveName), 'loadData requires saveName string');
+    ASSERT(isStringLike(saveName), 'readSaveData requires saveName string');
+    ASSERT(defaultSaveData === undefined ||
+        (typeof defaultSaveData === 'object' && defaultSaveData !== null),
+        'readSaveData: default must be an object - the result is ' +
+        '{...default, ...loaded}, so a scalar default yields {}. ' +
+        'Use readSaveData(key, {best:0}).best');
 
     // tolerate localStorage being unavailable (iOS private mode, sandboxed
     // iframes) and corrupt JSON in stored data
@@ -2717,7 +2754,7 @@ function readSaveData(saveName, defaultSaveData)
  *  @memberof Utilities */
 function writeSaveData(saveName, saveData)
 {
-    ASSERT(isStringLike(saveName), 'saveData requires saveName string');
+    ASSERT(isStringLike(saveName), 'writeSaveData requires saveName string');
     // tolerate localStorage being unavailable or quota exceeded
     try { localStorage[saveName] = JSON.stringify(saveData); }
     catch { LOG('writeSaveData: failed to write', saveName); }
@@ -2884,6 +2921,13 @@ let showSplashScreen = false;
  *  @default
  *  @memberof Settings */
 let headlessMode = false;
+
+/** Disables the automatic requestAnimationFrame loop so the engine only
+ *  advances when engineStep is called, for tests and frame-stepping tools
+ *  @type {boolean}
+ *  @default
+ *  @memberof Settings */
+let engineManualStep = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 // WebGL settings
@@ -3234,6 +3278,12 @@ function setShowSplashScreen(show) { showSplashScreen = show; }
  *  @param {boolean} headless
  *  @memberof Settings */
 function setHeadlessMode(headless) { headlessMode = headless; }
+
+/** Set if the engine only advances when engineStep is called
+ *  Must be set before engineInit
+ *  @param {boolean} [enable]
+ *  @memberof Settings */
+function setEngineManualStep(enable=true) { engineManualStep = enable; }
 
 /** Set if WebGL rendering is enabled
  *  @param {boolean} enable
@@ -16871,6 +16921,7 @@ export
     getPaused,
     setPaused,
     engineInit,
+    engineStep,
     engineObjectsUpdate,
     engineObjectsDestroy,
     engineObjectsCollect,
@@ -16918,6 +16969,7 @@ export
     fontDefault,
     showSplashScreen,
     headlessMode,
+    engineManualStep,
     tileDefaultSize,
     tileDefaultPadding,
     tileDefaultBleed,
@@ -16972,6 +17024,7 @@ export
     setFontDefault,
     setShowSplashScreen,
     setHeadlessMode,
+    setEngineManualStep,
     setGLEnable,
     setTileDefaultSize,
     setTileDefaultPadding,
