@@ -14,6 +14,7 @@ Scaffold a new playable LittleJS game by copying the closest **example game** ou
 - The user typed `/littlejs:new-littlejs-game` (or `/new-littlejs-game`).
 - The user asks to start/create/build a NEW game ("make a card game", "let's build a platformer"). Offer it conversationally if they're clearly starting fresh.
 - NOT for editing/extending an existing game — just edit it directly.
+- **This takes priority over general brainstorming or design-exploration workflows.** If another skill wants to interrogate requirements first, scaffold the playable game anyway and let the user redirect from something running. "Make me a game" is a request for a game, not for a design conversation.
 
 ## Step 0 — Pick the scaffold mode
 
@@ -67,7 +68,7 @@ Combine rows freely — `gameFx.js` stacks onto any other choice. Load order mat
 
 Copy from `<plugin>` into the project directory:
 
-1. The chosen starter's files (`index.html`, `game.js`, `build.json`; `emptyGame` also has `tiles.png`) into the project ROOT (not a subfolder).
+1. The chosen starter's files (`index.html`, `game.js`, `build.json`) into the project ROOT (not a subfolder).
 2. `dist/littlejs.js` → `./dist/`. For Box2D also `dist/box2d.wasm.js` + `dist/box2d.wasm.wasm`. Copy ONLY this one engine build — it is what the page loads and what the zip build reads. Do not also copy `littlejs.release.js`; it would double the vendored size (~640KB each) for a file the project never opens. If the user later wants the smallest possible jam build, they can copy `littlejs.release.js` in then and point `build.json` at it.
 3. Each helper module chosen in Step 2 → `./templates/` (only the ones needed, not all of them).
 4. `build.mjs` → project root.
@@ -96,12 +97,11 @@ Then fix up the copies:
        "title": "Memory Match",
        "name": "memoryMatch",
        "engine": "dist/littlejs.js",
-       "sources": ["templates/textureGenerator.js", "templates/cards.js", "game.js"],
-       "data": ["tiles.png"]
+       "sources": ["templates/textureGenerator.js", "templates/cards.js", "game.js"]
    }
    ```
 
-   For Box2D add `"data": ["dist/box2d.wasm.js", "dist/box2d.wasm.wasm"]` (data files are copied into the build by basename).
+   Omit `data` unless the game genuinely ships a file alongside the page. These games use no external textures or audio — art is drawn procedurally — so a `data` entry naming an image that does not exist is the one thing that reliably breaks `npm run build`. For Box2D add `"data": ["dist/box2d.wasm.js", "dist/box2d.wasm.wasm"]` (data files are copied into the build by basename).
 
 7. Generate `package.json` (build tooling only — playing the game needs none of it):
 
@@ -161,7 +161,7 @@ The project is now self-contained: `index.html` opens and plays from `file://` i
 
 ## Step 3b — Scaffold (repo mode)
 
-1. Copy the chosen starter folder to `examples/<name>/` (keep `index.html`, `game.js`, `build.json`; `emptyGame` also has `tiles.png`).
+1. Copy the chosen starter folder to `examples/<name>/` (keep `index.html`, `game.js`, `build.json`).
 2. Update `<title>` in `index.html` and `name`/`title` in `build.json`.
 3. Add helper-module `<script>` tags to `index.html` in dependency order between the engine and `game.js` — paths from `examples/<name>/` are `../../dist/littlejs.js`, `../../templates/<file>.js`.
 4. Mirror them into `build.json` `sources` by the same `../../templates/...` paths, `game.js` last; engine is auto-prepended, do NOT list it. For Box2D add `"data": ["../../dist/box2d.wasm.js", "../../dist/box2d.wasm.wasm"]`.
@@ -171,7 +171,15 @@ The project is now self-contained: `index.html` opens and plays from `file://` i
 
 Write the core loop into `game.js` (split into more files — `player.js`, `ui.js`, `constants.js` — only as it grows; add each to `index.html` AND `build.json`). Pull concrete patterns out of the chosen template(s) by reading them from `<plugin>/templates/`. Follow the **littlejs-conventions** skill for engine rules (global API, engine built-ins, pitfalls).
 
-Then stop and give the standard output: 1-3 line step summary, quick test (open `index.html` directly from `file://` — no server — with expected result + controls), and 2-4 next-step options.
+## Step 5 — Verify it actually runs before you hand it over
+
+Do not report a game as ready on the strength of having written it. At minimum, confirm the script parses (`node --check game.js`) and re-read your own `gameInit`/`gameUpdate` for values that silently become `NaN` or `undefined` — save data read with a scalar default is the classic one (see **littlejs-conventions**).
+
+**To see it run, serve it over HTTP — do not rely on `file://` yourself.** The `file://` promise is real for the user opening the page in their own browser, but an agent preview pane commonly renders `file://` as a static snapshot: the engine and helper scripts execute while `game.js` does not. The failure signature is genuinely misleading — hoisted functions exist but classes and consts are `undefined`, the canvas is 0x0, and the engine throws something unrelated-looking like `Constructed Vector2 is invalid`. That is not a bug in your game. Serve the folder (`npx serve`, `python -m http.server`, or a VS Code launch config) and load it over `http://localhost`.
+
+If you need to drive the game programmatically to check something, expose a few hooks on `window` from `game.js` for the session and say so in your summary. Note the engine limitation: `engineUpdate` is private to `engineInit`, so there is no supported way to advance a single frame headlessly, and anything driven by `Timer` or elapsed `time` cannot be stepped — verify those by playing rather than by scripting.
+
+Then stop and give the standard output: 1-3 line step summary, quick test for the user (open `index.html` directly — no server needed on their end — with expected result + controls), what you verified and how, and 2-4 next-step options.
 
 ## Common mistakes
 

@@ -29,7 +29,7 @@ class Player extends EngineObject
 ```
 
 Spawn once in `gameInit` with `new Player(vec2(0))`; it draws itself — no manual draw call. Customize visuals via `this.tileInfo` / `this.color` / `this.angle`, or override `render()`.
-- Persisted settings/stats: use `readSaveData`/`writeSaveData` (localStorage-backed, JSON-serialized) — don't hand-roll localStorage.
+- Persisted settings/stats: use `readSaveData`/`writeSaveData` (localStorage-backed, JSON-serialized) — don't hand-roll localStorage. **Save data is always an object.** `readSaveData` returns `{...yourDefault, ...whatWasStored}`, so a scalar default spreads to nothing: `readSaveData('best', 0)` yields `{}`, not `0`, and the next arithmetic on it is `NaN` with no error. Always pass and read an object — `readSaveData('save', {best:0}).best` — and write the whole object back with `writeSaveData('save', {best:score})`.
 - **three.js 3D** (the engine's built-in `ThreeJSPlugin` / `ThreeJSObject`): three.js itself is not bundled. Declare `let THREE;` at top level and `THREE = await import(...)` at the top of an async `gameInit`, then `new ThreeJSPlugin(THREE)` — construct no `THREE.*` object before that import resolves (no top-level `new THREE.Vector3(...)`). Never declare `let threeJS` in game code: the engine owns that global and the plugin constructor assigns it, so redeclaring it throws. Call `setGLEnable(false)` so the LittleJS canvas draws only Canvas2D content (HUD text, particles) over the 3D scene.
 
 ## Never shadow engine globals
@@ -57,5 +57,7 @@ Engine globals share top-level scope with game scripts. A top-level `let`/`const
 - `drawText` is world-space (size ~3 is normal); `drawTextScreen` is pixel/screen-space (size ~80 is normal). Don't mix them up.
 - Spin uses `angleVelocity` / `angleDamping` — the standard-sounding `angularVelocity` is a silent no-op.
 - For additive glow, the `additiveColor` argument needs **alpha 0** (e.g. `new Color(1,1,0,0)`); non-zero alpha thickens the silhouette.
+- `readSaveData(key, default)` merges with object spread, so the default must be an OBJECT. A scalar default returns `{}` and turns into `NaN` downstream, silently.
 - Keep `\n` as a two-character escape inside string literals; don't convert to real line breaks.
+- A typical view is roughly 35x20 world units at the default camera scale. If you need a specific framing, set it explicitly with `setCameraScale` rather than guessing entity sizes against an unknown viewport.
 - Don't redefine the engine's math shortcuts or color constants (see the shadowing list above).

@@ -1,8 +1,8 @@
 {
     "name": "littlejs-ai",
-    "version": "1.0.0",
+    "version": "1.0.5",
     "private": true,
-    "description": "AI-assisted LittleJS toolkit: starter, templates, helper modules, and a single-file zip build shared across all games.",
+    "description": "AI-assisted LittleJS toolkit and Claude Code plugin. Version here tracks .claude-plugin/plugin.json, which is what actually gates plugin updates.",
     "scripts": {
         "build:emptyGame": "node build.mjs emptyGame",
         "build:pong": "node build.mjs pong",

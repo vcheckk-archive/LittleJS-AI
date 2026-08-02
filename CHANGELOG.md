@@ -6,6 +6,23 @@ Notable changes to the **littlejs** Claude Code plugin. Follows [Keep a Changelo
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-08-01
+
+Changes from real-world feedback after building a game with 1.0.4.
+
+### Fixed
+
+- **Scaffolded games produced a `build.json` referencing a `tiles.png` that no longer exists**, so `npm run build` failed on first use. `tiles.png` was removed from `emptyGame` but four references survived — the starter's own `build.json` (which broke `node build.mjs emptyGame` outright) and three in the scaffolding skill. These games draw their art procedurally and ship no external textures, so the skill now says to omit `data` entirely unless the game genuinely ships a file alongside the page.
+- **`readSaveData` with a scalar default silently produces `NaN`.** It returns `{...yourDefault, ...whatWasStored}`, so `readSaveData('best', 0)` spreads a number and yields `{}` rather than `0`. A best-score built on it becomes `NaN` with no error anywhere — while following the skill's own advice to prefer it over hand-rolled localStorage. Now called out in `littlejs-conventions` twice: in the save-data guidance and again in the pitfalls list, where it belongs alongside the other silent-failure entries.
+- `package.json` still said `"version": "1.0.0"` while the plugin was on 1.0.4. Harmless to the plugin, but it is the obvious file to check, and one reader ended up grepping `engineVersion` out of the engine build to answer the question. Now tracks the plugin version and says which file actually gates updates.
+
+### Added
+
+- **A verification step before handing a game over.** Step 4 previously ended at "write the loop, then summarize", delegating all testing to the user — which is how the `readSaveData` bug above reached a finished game. There is now an explicit Step 5: check the script parses, re-read for values that silently go `NaN`, and report what was verified.
+- **Guidance to serve over HTTP when verifying your own work.** The `file://` promise holds for a user opening the page, but an agent preview pane commonly renders `file://` as a static snapshot where the engine runs and `game.js` does not. The symptom is badly misleading — hoisted functions exist, classes and consts are `undefined`, the canvas is 0x0, and the engine throws `Constructed Vector2 is invalid`, which reads like a name collision. Step 5 names the signature so nobody debugs a phantom.
+- A note that `new-littlejs-game` takes priority over general brainstorming workflows, so "make me a game" with another design-exploration plugin installed yields a game rather than a requirements interview.
+- A world-scale anchor in `littlejs-conventions` (a typical view is roughly 35x20 units), matching why the existing `drawText ~3` / `drawTextScreen ~80` note is useful.
+
 ## [1.0.4] - 2026-08-01
 
 ### Changed
@@ -71,7 +88,8 @@ First release. The repo itself is the plugin: `.claude-plugin/marketplace.json` 
 - `.github/copilot-instructions.md`, which described a repo layout from roughly six months earlier.
 - The `GPT/` ChatGPT package, moved to its own repo at [KilledByAPixel/LittleJS-GPT](https://github.com/KilledByAPixel/LittleJS-GPT) with its history. A marketplace install copies the whole repo, so it was shipping 680KB of unrelated files to everyone installing a game-dev plugin.
 
-[Unreleased]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.4...HEAD
+[Unreleased]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.5...HEAD
+[1.0.5]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/KilledByAPixel/LittleJS-AI/compare/v1.0.1...v1.0.2
